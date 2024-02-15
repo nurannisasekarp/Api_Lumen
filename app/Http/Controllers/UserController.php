@@ -114,7 +114,7 @@ class UserController extends Controller
                 return response()->json(
                     [
                         'success' => true,
-                        'message' => 'Successfuly Get A User Data',
+                        'message' => 'Successfully Get A User Data',
                         'data' => $getUser,
                     ],
                     200
@@ -183,7 +183,7 @@ class UserController extends Controller
                     return response()->json(
                         [
                             'success' => true,
-                            'message' => 'Successfuly Update A User Data',
+                            'message' => 'Successfully Update A User Data',
                             'data' => $getUser,
                         ],
                         200
@@ -246,6 +246,126 @@ class UserController extends Controller
                 400
             );
 
+        }
+    }
+
+    public function recycleBin()
+    {
+        try {
+
+            $userDeleted = User::onlyTrashed()->get();
+
+            if (!$userDeleted) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Deleted Data User Doesnt Exists',
+                    ],  
+                    400
+                );
+            } else {
+                return response()->json(
+                    [
+                        'success' => true,
+                        'message' => 'Successfully Get Data User Deleted',
+                        'data' => $userDeleted,
+                    ],
+                    200
+                );
+            }
+
+        } catch (\Exception $e) {
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+                400
+            );
+
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+
+            $getUser = User::onlyTrashed()->where('id', $id);
+
+            if (!$getUser) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Restored Data User Doesnt Exists',
+                    ],
+                    404
+                );
+            } else {
+                $restoreUser = $getUser->restore();
+
+                if ($restoreUser) {
+                    $getRestore = User::find($id);
+
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'message' => 'Successfully Restore A Deleted User Data',
+                            'data' => $getRestore,
+                        ],
+                        200
+                    );
+                }
+            }
+
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+                400
+            );
+        }
+    }
+
+    public function forceDestroy($id)
+    {
+        try {
+
+            $getUser = User::onlyTrashed()->where('id', $id);
+
+            if (!$getUser) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Data User for Permanent Delete Doesnt Exists',
+                    ],
+                    404
+                );
+            } else {
+                $forceUser = $getUser->forceDelete();
+
+                if ($forceUser) {
+
+                    return response()->json(
+                        [
+                            'success' => true,
+                            'message' => 'Successfully Permanent Delete A User Data',
+                        ],
+                        200
+                    );
+                }
+            }
+        } catch (\Exception $e) {
+
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+                400
+            );
         }
     }
 }

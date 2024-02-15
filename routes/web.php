@@ -35,5 +35,13 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->get('detail/{id}', 'UserController@show');
         $router->patch('update/{id}', 'UserController@update');
         $router->delete('delete/{id}', 'UserController@destroy');
+        $router->get('recycle-bin', 'UserController@recycleBin');
+        $router->get('restore/{id}', 'UserController@restore');
+        $router->get('force-delete/{id}', 'UserController@forceDestroy');
+    });
+
+    $router->group(['prefix' => 'stuff-stock'], function () use ($router) {
+        $router->get('/', 'StuffStockController@index');
+        $router->post('store', 'StuffStockController@store');
     });
 });

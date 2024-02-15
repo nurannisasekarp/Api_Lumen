@@ -2,8 +2,6 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
-use App\Http\Controllers\StuffController;
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -29,5 +27,13 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->get('recycle-bin', 'StuffController@recycleBin');
         $router->get('restore/{id}', 'StuffController@restore');
         $router->get('force-delete/{id}', 'StuffController@forceDestroy');
+    });
+
+    $router->group(['prefix' => 'user/'], function () use ($router) {
+        $router->get('/', 'UserController@index');
+        $router->post('store', 'UserController@store');
+        $router->get('detail/{id}', 'UserController@show');
+        $router->patch('update/{id}', 'UserController@update');
+        $router->delete('delete/{id}', 'UserController@destroy');
     });
 });

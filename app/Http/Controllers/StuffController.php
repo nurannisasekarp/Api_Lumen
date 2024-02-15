@@ -63,10 +63,7 @@ class StuffController extends Controller
                 'category' => 'required',
             ]);
 
-            $createStuff = Stuff::create([
-                'name' => $request->name,
-                'category' => $request->category,
-            ]);
+            $createStuff = Stuff::create($request->all());
 
             return response()->json(
                 [

@@ -83,7 +83,7 @@ class InboundStuffController extends Controller
                 $getStuff = Stuff::where('id', $request->stuff_id)->first();
                 $getStuffStock = StuffStock::where('stuff_id', $request->stuff_id)->first();
 
-                if ($getStuffStock) {
+                if (!$getStuffStock) {
                     $updateStock = StuffStock::create([
                         'stuff_id' => $request->stuff_id,
                         'total_available' => $getStuffStock['total_available'] + $request->total,
@@ -235,11 +235,17 @@ class InboundStuffController extends Controller
                 $getStuff = Stuff::where('id', $getInboundStuff['stuff_id'])->first();
                 $getStuffStock = StuffStock::where('stuff_id', $getInboundStuff['stuff_id'])->first();
 
-                // if ($getStuff['id'] != $request->stuff_id) {
-
-                $updatedStock = $getStuffStock->update([
-                    'total_available' => $getStuffStock['total_available'] - $getInboundStuff['total'],
-                ]);
+                if ($getStuffStock) {
+                    $updateStock = $getStuffStock->update([
+                        'total_available' => ($getStuffStock['total_available'] - $getInboundStuff['total']) + $request->total,
+                    ]);
+                } else {
+                    $updateStock = StuffStock::create([
+                        'stuff_id' => $request->stuff_id,
+                        'total_available' => $getStuffStock['total_available'] + $request->total,
+                        'total_defac' => 0,
+                    ]);
+                }
 
                 $updateInbound = $getInboundStuff->update([
                     'stuff_id' => $request->stuff_id,
@@ -247,17 +253,6 @@ class InboundStuffController extends Controller
                     'date' => $request->date,
                     'proff_file' => $proffName,
                 ]);
-
-                if ($updateInbound) {
-                    $updateStock = $getStuffStock->updateOrCreate([
-                        'stuff_id' => $request->stuff_id, 
-                    ],
-                    [
-                        'stuff_id' => $request->stuff_id,
-                        'total_available' => $getStuffStock['total_available'] + $request->total,
-                        'total_defac' => 0,
-                    ]);
-                }
 
                 $stuff = [
                     'stuff' => $getStuff,
@@ -273,9 +268,6 @@ class InboundStuffController extends Controller
                     ],
                     200
                 );
-                // }  else {
-                //     $updateInbound = 
-                // }
 
             }
         } catch (\Exception $e) {

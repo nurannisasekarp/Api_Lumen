@@ -16,7 +16,7 @@ class InboundStuff extends Model
         'proff_file',
     ];
 
-    public function sutff()
+    public function stuff()
     {
         return $this->belongsTo(Stuff::class);
     }

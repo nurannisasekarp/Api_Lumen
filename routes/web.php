@@ -43,5 +43,20 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
     $router->group(['prefix' => 'stuff-stock'], function () use ($router) {
         $router->get('/', 'StuffStockController@index');
         $router->post('store', 'StuffStockController@store');
+        $router->get('detail/{id}', 'StuffStockController@show');
+        $router->patch('update/{id}', 'StuffStockController@update');
+        $router->delete('delete/{id}', 'StuffStockController@destroy');
+        $router->get('recycle-bin', 'StuffStockController@recycleBin');
+        $router->get('restore/{id}', 'StuffStockController@restore');
+        $router->get('force-delete/{id}', 'StuffStockController@forceDestroy');
+        $router->post('add-stock/{id}', 'StuffStockController@addStock');
+        $router->post('sub-stock/{id}', 'StuffStockController@subStock');
+    });
+
+    $router->group(['prefix' => 'inbound-stuff'], function () use ($router) {
+        $router->get('/', 'InboundStuffController@index');
+        $router->post('store', 'InboundStuffController@store');
+        $router->get('detail/{id}', 'InboundStuffController@show');
+        $router->patch('update/{id}', 'InboundStuffController@update');
     });
 });

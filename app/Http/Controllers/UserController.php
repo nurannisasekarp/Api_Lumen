@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -17,23 +18,9 @@ class UserController extends Controller
         try {
             $users = User::all();
 
-            return response()->json(
-                [
-                    'success' => true,
-                    'message' => 'Successfully Get All User Data',
-                    'data' => $users,
-                ],
-                200
-            );
+            return ResponseFormatter::sendResponse(200, true, 'Successfully Get All User Data', $users);
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -71,23 +58,9 @@ class UserController extends Controller
                 'role' => $request->role,
             ]);
 
-            return response()->json(
-                [
-                    'success' => true,
-                    'message' => 'Successfully Create A User Data',
-                    'data' => $createUser,
-                ],
-                200
-            );
+            return ResponseFormatter::sendResponse(200, true, 'Successfully Create A User Data', $createUser);
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -103,32 +76,12 @@ class UserController extends Controller
             $getUser = User::find($id);
 
             if (!$getUser) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data User Not Found',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data User Not Found');
             } else {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Successfully Get A User Data',
-                        'data' => $getUser,
-                    ],
-                    200
-                );
+                return ResponseFormatter::sendResponse(200, true, 'Successfully Get A User Data', $getUser);
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -157,13 +110,7 @@ class UserController extends Controller
             $getUser = User::find($id);
 
             if (!$getUser) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data User Not Found',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data User Not Found');
             } else {
                 $this->validate($request, [
                     'username' => 'required',
@@ -180,25 +127,11 @@ class UserController extends Controller
                 ]);
 
                 if ($updateUser) {
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Update A User Data',
-                            'data' => $getUser,
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Update A User Data', $getUser);
                 }
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -215,37 +148,17 @@ class UserController extends Controller
             $getUser = User::find($id);
 
             if (!$getUser) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data User Not Found'
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data User Not Found');
             } else {
                 $deleteUser = $getUser->delete();
 
                 if ($deleteUser) {
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Delete A Data User',
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Delete A User Data');
                 }
 
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
-
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -256,76 +169,33 @@ class UserController extends Controller
             $userDeleted = User::onlyTrashed()->get();
 
             if (!$userDeleted) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Deleted Data User Doesnt Exists',
-                    ],  
-                    400
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Deletd Data User Doesnt Exists');
             } else {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Successfully Get Data User Deleted',
-                        'data' => $userDeleted,
-                    ],
-                    200
-                );
+                return ResponseFormatter::sendResponse(200, true, 'Successfully Get Delete All User Data', $userDeleted);
             }
-
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
-
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
     public function restore($id)
     {
         try {
-
             $getUser = User::onlyTrashed()->where('id', $id);
 
             if (!$getUser) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Restored Data User Doesnt Exists',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data User Not Found');
             } else {
                 $restoreUser = $getUser->restore();
 
                 if ($restoreUser) {
                     $getRestore = User::find($id);
 
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Restore A Deleted User Data',
-                            'data' => $getRestore,
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Restore A Deleted User Data', $getRestore);
                 }
             }
-
         } catch (\Exception $e) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -336,36 +206,16 @@ class UserController extends Controller
             $getUser = User::onlyTrashed()->where('id', $id);
 
             if (!$getUser) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data User for Permanent Delete Doesnt Exists',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data User for Permanent Delete Doesnt Exists');
             } else {
                 $forceUser = $getUser->forceDelete();
 
                 if ($forceUser) {
-
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Permanent Delete A User Data',
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Permanent Delete A User Data');
                 }
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseFormatter;
 use App\Models\InboundStuff;
 use App\Models\Stuff;
 use App\Models\StuffStock;
@@ -17,25 +18,11 @@ class InboundStuffController extends Controller
     public function index()
     {
         try {
-
             $getInboundStuff = InboundStuff::with('stuff')->get();
 
-            return response()->json(
-                [
-                    'success' => true,
-                    'message' => 'Successfully Get All Inbound Stuff Data',
-                    'data' => $getInboundStuff,
-                ],
-                200
-            );
+            return ResponseFormatter::sendResponse(200, true, 'Successfully Get All Inbound Stuff Data', $getInboundStuff);
         } catch (\Exception $e) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -86,59 +73,34 @@ class InboundStuffController extends Controller
                 if (!$getStuffStock) {
                     $updateStock = StuffStock::create([
                         'stuff_id' => $request->stuff_id,
-                        'total_available' => $getStuffStock['total_available'] + $request->total,
+                        'total_available' => $request->total,
                         'total_defac' => 0,
                     ]);
                 } else {
-                    $updateStock = $getStuffStock->update(
-                        [
-                            'stuff_id' => $request->stuff_id,
-                            'total_available' => $getStuffStock['total_available'] + $request->total,
-                            'total_defac' => 0,
-                        ]);    
+                    $updateStock = $getStuffStock->update([
+                        'stuff_id' => $request->stuff_id,
+                        'total_available' => $getStuffStock['total_available'] + $request->total,
+                        'total_defac' => $getStuffStock['total_defac'],
+                    ]);
                 }
-                
+
                 if ($updateStock) {
+                    $getStock = StuffStock::where('stuff_id', $request->stuff_id)->first();
                     $stuff = [
                         'stuff' => $getStuff,
                         'inboundStuff' => $createStock,
-                        'stuffStock' => $getStuffStock,
+                        'stuffStock' => $getStock,
                     ];
 
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Create A Stuff Stock Data',
-                            'data' => $stuff,
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Create A Inbound Stuff Data', $stuff);
                 } else {
-                    return response()->json(
-                        [
-                            'success' => false,
-                            'message' => 'Failed To Update A Stuff Stock Data',
-                        ],
-                        400
-                    );
+                    return ResponseFormatter::sendResponse(400, false, 'Failed To Update A Stuff Stock Data');
                 }
             } else {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Failed To Create A Inbound Stuff Data',
-                    ],
-                    400
-                );
+                return ResponseFormatter::sendResponse(400, false, 'Failed To Create A Inbound Stuff Data');
             }
         } catch (\Exception $e) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -155,32 +117,12 @@ class InboundStuffController extends Controller
             $getInboundStuff = InboundStuff::with('stuff')->find($id);
 
             if (!$getInboundStuff) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data Inbound Stuff Not Found'
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Inbound Stuff Not Found');
             } else {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Successfully Get A Inbound Stock Data',
-                        'data' => $getInboundStuff,
-                    ],
-                    200
-                );
+                return ResponseFormatter::sendResponse(200, true, 'Successfully Get A Inbound Stuff Data', $getInboundStuff);
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -208,13 +150,7 @@ class InboundStuffController extends Controller
             $getInboundStuff = InboundStuff::find($id);
 
             if (!$getInboundStuff) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data Inbound Stuff Not Found'
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Inbound Stuff Not Found');
             } else {
 
                 $this->validate($request, [
@@ -234,16 +170,18 @@ class InboundStuffController extends Controller
 
                 $getStuff = Stuff::where('id', $getInboundStuff['stuff_id'])->first();
                 $getStuffStock = StuffStock::where('stuff_id', $getInboundStuff['stuff_id'])->first();
+                $getCurrentStock = StuffStock::where('stuff_id', $request['stuff_id'])->first();
 
-                if ($getStuffStock) {
+                if ($getStuffStock['stuff_id'] == $request['stuff_id']) {
                     $updateStock = $getStuffStock->update([
-                        'total_available' => ($getStuffStock['total_available'] - $getInboundStuff['total']) + $request->total,
+                        'total_available' => $getStuffStock['total_available'] - $getInboundStuff['total'] + $request->total,
                     ]);
                 } else {
-                    $updateStock = StuffStock::create([
-                        'stuff_id' => $request->stuff_id,
-                        'total_available' => $getStuffStock['total_available'] + $request->total,
-                        'total_defac' => 0,
+                    $updateStock = $getStuffStock->update([
+                        'total_available' => $getStuffStock['total_available'] - $getInboundStuff['total'],
+                    ]);
+                    $updateStock = $getCurrentStock->update([
+                        'total_available' => $getStuffStock['total_available']  + $request->total,
                     ]);
                 }
 
@@ -254,31 +192,21 @@ class InboundStuffController extends Controller
                     'proff_file' => $proffName,
                 ]);
 
+                $getStock = StuffStock::where('stuff_id', $request['stuff_id'])->first();
+                $getInbound = InboundStuff::find($id);
+                $getCurrentStuff = Stuff::where('id', $request['stuff_id'])->first();
+
                 $stuff = [
-                    'stuff' => $getStuff,
-                    'inboundStuff' => $getInboundStuff,
-                    'stuffStock' => $getStuffStock,
+                    'stuff' => $getCurrentStuff,
+                    'inboundStuff' => $getInbound,
+                    'stuffStock' => $getStock,
                 ];
 
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Successfully Update A Stuff Stock Data',
-                        'data' => $stuff,
-                    ],
-                    200
-                );
-
+                return ResponseFormatter::sendResponse(200, true, 'Successfully Update A Inbound Stuff Data', $stuff);
             }
         } catch (\Exception $e) {
 
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -290,6 +218,87 @@ class InboundStuffController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+
+            $getInboundStuff = InboundStuff::find($id);
+
+            if (!$getInboundStuff) {
+                return ResponseFormatter::sendResponse(404, false, 'Data Inbound Stuff Not Found');
+            } else {
+                $deleteStuff = $getInboundStuff->delete();
+                $subStock = StuffStock::where('stuff_id', $getInboundStuff['stuff_id'])->first();
+                $updateStock = $subStock->update([
+                    'total_available' => $subStock['total_available'] - $getInboundStuff['total'],
+                ]);
+
+                if ($deleteStuff && $updateStock) {
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Delete A Inbound Stuff Data');
+                }
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
+        }
+    }
+
+    public function recycleBin()
+    {
+        try {
+
+            $inboundStuffDeleted = InboundStuff::onlyTrashed()->get();
+
+            if (!$inboundStuffDeleted) {
+                return ResponseFormatter::sendResponse(404, false, 'Deletd Data Inbound Stuff Doesnt Exists');
+            } else {
+                return ResponseFormatter::sendResponse(200, true, 'Successfully Get Delete All Inbound Stuff Data', $inboundStuffDeleted);
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+
+            $getInboundStuff = InboundStuff::onlyTrashed()->where('id', $id);
+
+            if (!$getInboundStuff) {
+                return ResponseFormatter::sendResponse(404, false, 'Restored Data Inbound Stuff Doesnt Exists');
+            } else {
+                $restoreStuff = $getInboundStuff->restore();
+
+                if ($restoreStuff) {
+                    $getRestore = InboundStuff::find($id);
+                    $addStock = StuffStock::where('stuff_id', $getRestore['stuff_id'])->first();
+                    $updateStock = $addStock->update([
+                        'total_available' => $addStock['total_available'] + $getRestore['total'],
+                    ]);
+
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Restore A Deleted Inbound Stuff Data', $getRestore);
+                }
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
+        }
+    }
+
+    public function forceDestroy($id)
+    {
+        try {
+
+            $getInboundStuff = InboundStuff::onlyTrashed()->where('id', $id);
+
+            if (!$getInboundStuff) {
+                return ResponseFormatter::sendResponse(404, false, 'Data Inbound Stuff for Permanent Delete Doesnt Exists');
+            } else {
+                $forceStuff = $getInboundStuff->forceDelete();
+
+                if ($forceStuff) {
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Permanent Delete A Inbound Stuff Data');
+                }
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
+        }
     }
 }

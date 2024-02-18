@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Stuff;
+use App\Helpers\ResponseFormatter; //Import file ResponseFormatter.php untuk memberikan format dari hasil response kedalam JSON.
+use App\Models\Stuff; // Import file Models/Stuff.php untuk mengarahkan table mana yang akan digunakan.
 use Illuminate\Http\Request;
 
 class StuffController extends Controller
@@ -15,27 +16,13 @@ class StuffController extends Controller
     public function index()
     {
         try {
+            $stuffs = Stuff::all()->toArray(); // Menadapatkan keseluruhan data dari tabel stuffs
 
-            $stuffs = Stuff::all();
-
-            return response()->json(
-                [
-                    'success' => true,
-                    'message' => 'Successfully Get All Stuff Data',
-                    'data' => $stuffs,
-                ],
-                200
-            );
-        } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(200, true, 'Successfully Get All Stuff Data', $stuffs);
+        } catch (\Exception $e) { // Exception adalah objek yang menjelaskan kesalahan atau perilaku tak terduga dari skrip PHP
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
+        // Try-Catch digunakan untuk pengecekan suatu proses berhasil atau tidak. Semua baris pada try akan dijalankan terlebih dahulu, jika  $stuffs = Stuff::all() berhasil diproses tanpa adanya error, maka akan mengembalikan response JSON berupa data hasil dari tabel dengan menggunakan static method sendResponse() dari Response Formatter. Jika ada error pada baris kode try maka prosesnya akan dialihkan pada baris kode catch yang mengembalikan response JSON error dengan menggunakan static method error() dari ResponseFormatter.
     }
 
     /**
@@ -57,31 +44,24 @@ class StuffController extends Controller
     public function store(Request $request)
     {
         try {
-
             $this->validate($request, [
                 'name' => 'required',
                 'category' => 'required',
             ]);
+            // Penggunaan validasi antara laravel dan lumen laravel berbeda penulisannya. Pada lumen untuk validasi menggunakan method validasi dari class controller yang memiliki dua argument.
+            // argument pertama adalah data mana yang divalidasi
+            // argument kedua berupa tipe validasi apa yang diberikan untuk sumber datanya
 
             $createStuff = Stuff::create($request->all());
+            // Jika antara nama kolom di database dan nama key di request sama maka bisa menggunakan perintah diatas, namun jika berbeda haruslah definisikan satu persatu kolomnya seperti dibawah ini.
+            // $createStuff = Stuff::create([
+            //     'name' => $request->name,
+            //     'category' => $request->category,
+            // ]);
 
-            return response()->json(
-                [
-                    'success' => true,
-                    'message' => 'Successfully Create A Stuff Data',
-                    'data' => $createStuff,
-                ],
-                200
-            );
+            return ResponseFormatter::sendResponse(200, true, 'Successfully Create A Stuff Data', $createStuff);
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -98,32 +78,12 @@ class StuffController extends Controller
             $getStuff = Stuff::find($id);
 
             if (!$getStuff) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data Stuff Not Found',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Stuff Not Found', $getStuff);
             } else {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Successfully Get A Stuff Data',
-                        'data' => $getStuff,
-                    ],
-                    200
-                );
+                return ResponseFormatter::sendResponse(200, true, 'Successfully Get A Stuff Data', $getStuff);
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -152,13 +112,7 @@ class StuffController extends Controller
             $getStuff = Stuff::find($id);
 
             if (!$getStuff) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data Stuff Not Found',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Stuff Not Found', $getStuff);
             } else {
                 $this->validate($request, [
                     'name' => 'required',
@@ -173,25 +127,11 @@ class StuffController extends Controller
                 if ($updateStuff) {
                     $getUpdate = Stuff::find($id);
 
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Update A Stuff Data',
-                            'data' => $getUpdate,
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Update A Stuff Data', $getUpdate);
                 }
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -208,35 +148,16 @@ class StuffController extends Controller
             $getStuff = Stuff::find($id);
 
             if (!$getStuff) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data Stuff Not Found',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Stuff Not Found', $getStuff);
             } else {
                 $deleteStuff = $getStuff->delete();
 
                 if ($deleteStuff) {
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Delete A Stuff Data',
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Delete A Stuff Data');
                 }
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -247,32 +168,12 @@ class StuffController extends Controller
             $stuffDeleted = Stuff::onlyTrashed()->get();
 
             if (!$stuffDeleted) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Deletd Data Stuff Doesnt Exists',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Stuff Not Found');
             } else {
-                return response()->json(
-                    [
-                        'success' => true,
-                        'message' => 'Successfully Get Deleted Stuff Data',
-                        'data' => $stuffDeleted,
-                    ],
-                    200
-                );
+                return ResponseFormatter::sendResponse(200, true, 'Successfully Get Delete All Stuff Data', $stuffDeleted);
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -283,38 +184,18 @@ class StuffController extends Controller
             $getStuff = Stuff::onlyTrashed()->where('id', $id);
 
             if (!$getStuff) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Restored Data Stuff Doesnt Exists',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Stuff Not Found');
             } else {
                 $restoreStuff = $getStuff->restore();
 
                 if ($restoreStuff) {
                     $getRestore = Stuff::find($id);
 
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Restore A Deleted Stuff Data',
-                            'data' => $getRestore,
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Restore A Deleted Stuff Data', $getRestore);
                 }
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
         }
     }
 
@@ -325,37 +206,16 @@ class StuffController extends Controller
             $getStuff = Stuff::onlyTrashed()->where('id', $id);
 
             if (!$getStuff) {
-                return response()->json(
-                    [
-                        'success' => false,
-                        'message' => 'Data Stuff for Permanent Delete Doesnt Exists',
-                    ],
-                    404
-                );
+                return ResponseFormatter::sendResponse(404, false, 'Data Stuff for Permanent Delete Doesnt Exists');
             } else {
                 $forceStuff = $getStuff->forceDelete();
 
                 if ($forceStuff) {
-
-                    return response()->json(
-                        [
-                            'success' => true,
-                            'message' => 'Successfully Permanent Delete A Stuff Data',
-                        ],
-                        200
-                    );
+                    return ResponseFormatter::sendResponse(200, true, 'Successfully Permanent Delete A Stuff Data');
                 }
             }
         } catch (\Exception $e) {
-
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => $e->getMessage(),
-                ],
-                400
-            );
-
-        }
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
+        } 
     }
 }

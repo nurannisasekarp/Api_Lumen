@@ -32,12 +32,12 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'password',
     ];
 
-    public function lending()
+    public function lendings()
     {
         return $this->hasMany(Lending::class);
     }
 
-    public function restoration()
+    public function restorations()
     {
         return $this->hasMany(Restoration::class);
     }

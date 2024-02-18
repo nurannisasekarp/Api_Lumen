@@ -13,7 +13,7 @@ class Restoration extends Model
         'user_id',
         'lending_id',
         'date_time',
-        'total_good_stuff',
+        'total_goof_stuff',
         'total_defac_stuff'
     ];
 
@@ -22,7 +22,7 @@ class Restoration extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function restoration() 
+    public function lending() 
     {
         return $this->belongsTo(Lending::class);
     }

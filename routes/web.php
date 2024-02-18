@@ -17,6 +17,9 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+// Struktur pembuatan route
+// $route->methodHttp('/path', 'NamaController@method');
+
 $router->group(['prefix' => 'api/v1/'], function () use ($router) {
     $router->group(['prefix' => 'stuff/'], function () use ($router) {
         $router->get('/', 'StuffController@index');
@@ -58,5 +61,9 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->post('store', 'InboundStuffController@store');
         $router->get('detail/{id}', 'InboundStuffController@show');
         $router->patch('update/{id}', 'InboundStuffController@update');
+        $router->delete('delete/{id}', 'InboundStuffController@destroy');
+        $router->get('recycle-bin', 'InboundStuffController@recycleBin');
+        $router->get('restore/{id}', 'InboundStuffController@restore');
+        $router->get('force-delete/{id}', 'InboundStuffController@forceDestroy');
     });
 });

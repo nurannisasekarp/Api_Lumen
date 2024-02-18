@@ -9,22 +9,22 @@ class Stuff extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
+    protected $fillable = [ 
         'name',
         'category',
     ];
 
-    public function stuffStock() 
+    public function stuffStock()
     {
         return $this->hasOne(stuffStock::class);
     }
 
-    public function inboundStuff()
+    public function inboundStuffs()
     {
         return $this->hasMany(InboundStuff::class);
     }
 
-    public function lending()
+    public function lendings()
     {
         return $this->hasMany(Lending::class);
     }

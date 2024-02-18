@@ -77,4 +77,8 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->get('restore/{id}', 'LendingController@restore');
         $router->get('force-delete/{id}', 'LendingController@forceDestroy');
     });
+
+    $router->group(['prefix' => 'restoration'], function () use ($router) {
+        $router->get('/', 'RestorationController@index');
+    });
 });

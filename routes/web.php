@@ -66,4 +66,15 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->get('restore/{id}', 'InboundStuffController@restore');
         $router->get('force-delete/{id}', 'InboundStuffController@forceDestroy');
     });
+
+    $router->group(['prefix' => 'lending'], function () use ($router) {
+        $router->get('/', 'LendingController@index');
+        $router->post('store', 'LendingController@store');
+        $router->get('detail/{id}', 'LendingController@show');
+        $router->patch('update/{id}', 'LendingController@update');
+        $router->delete('delete/{id}', 'LendingController@destroy');
+        $router->get('recycle-bin', 'LendingController@recycleBin');
+        $router->get('restore/{id}', 'LendingController@restore');
+        $router->get('force-delete/{id}', 'LendingController@forceDestroy');
+    });
 });

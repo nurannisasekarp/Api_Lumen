@@ -80,5 +80,12 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
 
     $router->group(['prefix' => 'restoration'], function () use ($router) {
         $router->get('/', 'RestorationController@index');
+        $router->post('store', 'RestorationController@store');
+        $router->get('detail/{id}', 'RestorationController@show');
+        $router->patch('update/{id}', 'RestorationController@update');
+        $router->delete('delete/{id}', 'RestorationController@destroy');
+        $router->get('recycle-bin', 'RestorationController@recycleBin');
+        $router->get('restore/{id}', 'RestorationController@restore');
+        $router->get('force-delete/{id}', 'RestorationController@forceDestroy');
     });
 });

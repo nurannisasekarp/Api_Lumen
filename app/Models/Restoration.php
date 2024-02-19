@@ -22,7 +22,7 @@ class Restoration extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function lending() 
+    public function lending()
     {
         return $this->belongsTo(Lending::class);
     }

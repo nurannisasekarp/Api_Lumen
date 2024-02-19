@@ -191,6 +191,7 @@ class InboundStuffController extends Controller
                     'date' => $request->date,
                     'proff_file' => $proffName,
                 ]);
+                unlink(base_path('public/proof/' . $getInboundStuff['proff_file']));
 
                 $getStock = StuffStock::where('stuff_id', $request['stuff_id'])->first();
                 $getInbound = InboundStuff::find($id);
@@ -226,6 +227,7 @@ class InboundStuffController extends Controller
                 return ResponseFormatter::sendResponse(404, false, 'Data Inbound Stuff Not Found');
             } else {
                 $deleteStuff = $getInboundStuff->delete();
+                unlink(base_path('public/proof/' . $getInboundStuff['proff_file']));
                 $subStock = StuffStock::where('stuff_id', $getInboundStuff['stuff_id'])->first();
                 $updateStock = $subStock->update([
                     'total_available' => $subStock['total_available'] - $getInboundStuff['total'],

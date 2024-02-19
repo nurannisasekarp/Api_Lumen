@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('token')->nullable();
+            // Tambah kolom token pada tabel users, token ini nantinya akan digunakan pada proses authentication
         });
     }
 

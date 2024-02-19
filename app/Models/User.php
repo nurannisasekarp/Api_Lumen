@@ -21,6 +21,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     protected $fillable = [
         'name', 'email', 'password', 'role', 'username', 'token'
+        // jangan lupa tamabahkan kolom token ke rules fillable 
     ];
 
     /**

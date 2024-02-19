@@ -36,7 +36,15 @@ class Authenticate
     public function handle($request, Closure $next, $guard = null)
     {
         if ($this->auth->guard($guard)->guest()) {
-            return response('Unauthorized.', 401);
+            return response()->json(
+                [
+                    'code' => 401,
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ],
+                401
+            );
+            // Ubah format menjadi seperti berikut untuk user yang mencoba mengakses api tanpa login
         }
 
         return $next($request);

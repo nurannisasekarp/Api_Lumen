@@ -24,7 +24,7 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
 
     $router->post('/login', 'UserController@login');
 
-    $router->group(['prefix' => 'stuff/'], function () use ($router) {
+    $router->group(['prefix' => 'stuff/', 'middleware' => 'auth'], function () use ($router) {
         $router->get('/', 'StuffController@index');
         $router->post('store', 'StuffController@store');
         $router->get('detail/{id}', 'StuffController@show');

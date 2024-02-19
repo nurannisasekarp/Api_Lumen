@@ -24,6 +24,7 @@ $app = new Laravel\Lumen\Application(
 );
 
 $app->withFacades();
+// Uncomment line diatas untuk mengaktifasi penggunaan facades di contoller sehingga dapat menggunakan package dari Facades (seperti package Hash)
 
 // $app->withEloquent();
 
@@ -79,6 +80,7 @@ $app->configure('app');
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
 ]);
+// Uncomment line diatas yang mana hal tersebut menandakan pendaftaran dan aktifasi middleware auth, sehingga middleware auth bisa langsung digunakan di controller 
 
 /*
 |--------------------------------------------------------------------------
@@ -92,7 +94,7 @@ $app->routeMiddleware([
 */
 
 // $app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class); // Uncommet line ini untuk mendaftarkan.mengaktifassi AuthServiceProvider agar bisa digunakan untuk mendapatkan hasil setelah proses authentikasi berlangsung
 // $app->register(App\Providers\EventServiceProvider::class);
 
 /*

@@ -227,20 +227,28 @@ class UserController extends Controller
                 'password' => 'required',
             ]);
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->first(); // Mencari dan mendapatkan data user berdasarkan email yang digunakan untuk login
 
             if (!$user) {
+                // Jika email tidak terdafatar maka akan dikembalikan response error
                 return ResponseFormatter::sendResponse(400, false, 'Login Failed! User Doesnt Exists');
             } else {
+                // Jika email terdaftar, selanjutnya pencocokan password yang diinput dengan password di database dengan menggunakan Hash::check().
                 $isValid = Hash::check($request->password, $user->password);
 
                 if (!$isValid) {
+                    // Jika password tidak cocok maka akan dikembalikan dengan response error
                     return ResponseFormatter::sendResponse(400, false, 'Login Failed! Password Doesnt Match');
                 } else {
+                    // Jika password sesuai selanjutnya akan membuat token
+                    // bin2hex digunakan untuk dapat mengonversi string karakter ASCII menjadi nilai heksadesimal
+                    // random_bytes menghasilkan byte pseudo-acak yang aman secara kriptografis dengan panjang 40 karakter
                     $generateToken = bin2hex(random_bytes(40));
+                    // Token inilah nanti yang digunakan pada proses authentication user yang login
 
                     $user->update([
                         'token' => $generateToken
+                        // update kolom token dengan value hasil dari generateToken di row user yang ingin login
                     ]);
 
                     return ResponseFormatter::sendResponse(200, true, 'Login Successfully', $user);

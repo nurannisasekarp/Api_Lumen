@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class StuffController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -216,6 +220,6 @@ class StuffController extends Controller
             }
         } catch (\Exception $e) {
             return ResponseFormatter::sendResponse(400, false, $e->getMessage());
-        } 
+        }
     }
 }

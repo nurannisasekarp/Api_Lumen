@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseFormatter;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -54,7 +55,7 @@ class UserController extends Controller
             $createUser = User::create([
                 'username' => $request->username,
                 'email' => $request->email,
-                'password' => app('hash')->make($request->password),
+                'password' => Hash::make($request->password),
                 'role' => $request->role,
             ]);
 
@@ -144,7 +145,7 @@ class UserController extends Controller
     public function destroy($id)
     {
         try {
-            
+
             $getUser = User::find($id);
 
             if (!$getUser) {
@@ -155,7 +156,6 @@ class UserController extends Controller
                 if ($deleteUser) {
                     return ResponseFormatter::sendResponse(200, true, 'Successfully Delete A User Data');
                 }
-
             }
         } catch (\Exception $e) {
             return ResponseFormatter::sendResponse(400, false, $e->getMessage());
@@ -212,6 +212,38 @@ class UserController extends Controller
 
                 if ($forceUser) {
                     return ResponseFormatter::sendResponse(200, true, 'Successfully Permanent Delete A User Data');
+                }
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
+        }
+    }
+
+    public function login(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'email' => 'required',
+                'password' => 'required',
+            ]);
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return ResponseFormatter::sendResponse(400, false, 'Login Failed! User Doesnt Exists');
+            } else {
+                $isValid = Hash::check($request->password, $user->password);
+
+                if (!$isValid) {
+                    return ResponseFormatter::sendResponse(400, false, 'Login Failed! Password Doesnt Match');
+                } else {
+                    $generateToken = bin2hex(random_bytes(40));
+
+                    $user->update([
+                        'token' => $generateToken
+                    ]);
+
+                    return ResponseFormatter::sendResponse(200, true, 'Login Successfully', $user);
                 }
             }
         } catch (\Exception $e) {

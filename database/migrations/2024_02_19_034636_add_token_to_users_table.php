@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            DB::statement("ALTER TABLE students ALTER COLUMN nis TYPE varchar(10)");
-
-             // Jika ingin mengganti tipe data dari suatu kolom, dapat menggunakan query sql langsung dengan perintah ALTER.
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('token')->nullable();
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('students', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('token');
         });
     }
 };

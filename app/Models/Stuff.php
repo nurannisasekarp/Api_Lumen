@@ -9,6 +9,9 @@ class Stuff extends Model
 {
     use SoftDeletes;
 
+    // protected $primaryKey = 'no';
+    // Set kolom primary key jika kolom primary key bukan lah kolom id, karena default primary key pada suatu tabel di laravel terdapat di kolom id
+    
     protected $fillable = [ 
         'name',
         'category',

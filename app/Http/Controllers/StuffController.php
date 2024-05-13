@@ -16,7 +16,7 @@ class StuffController extends Controller
     public function index()
     {
         try {
-            $stuffs = Stuff::all()->toArray(); // Menadapatkan keseluruhan data dari tabel stuffs
+            $stuffs = Stuff::with('stuffStock','inboundstuff','lendings')->get(); // Menadapatkan keseluruhan data dari tabel stuffs
 
             return ResponseFormatter::sendResponse(200, true, 'Successfully Get All Stuff Data', $stuffs);
         } catch (\Exception $e) { // Exception adalah objek yang menjelaskan kesalahan atau perilaku tak terduga dari skrip PHP
@@ -52,12 +52,12 @@ class StuffController extends Controller
             // argument pertama adalah data mana yang divalidasi
             // argument kedua berupa tipe validasi apa yang diberikan untuk sumber datanya
 
-            $createStuff = Stuff::create($request->all());
+            // $createStuff = Stuff::create($request->all());
             // Jika antara nama kolom di database dan nama key di request sama maka bisa menggunakan perintah diatas, namun jika berbeda haruslah definisikan satu persatu kolomnya seperti dibawah ini.
-            // $createStuff = Stuff::create([
-            //     'name' => $request->name,
-            //     'category' => $request->category,
-            // ]);
+            $createStuff = Stuff::create([
+                'name' => $request->name,
+                'category' => $request->category,
+            ]);
 
             return ResponseFormatter::sendResponse(200, true, 'Successfully Create A Stuff Data', $createStuff);
         } catch (\Exception $e) {
@@ -75,7 +75,7 @@ class StuffController extends Controller
     {
         try {
 
-            $getStuff = Stuff::find($id);
+            $getStuff = Stuff::where('id', $id)->with('stuffStock','inboundStuffs','lendings')->first();
 
             if (!$getStuff) {
                 return ResponseFormatter::sendResponse(404, false, 'Data Stuff Not Found', $getStuff);
@@ -143,14 +143,21 @@ class StuffController extends Controller
      */
     public function destroy($id)
     {
+           
         try {
-
             $getStuff = Stuff::find($id);
 
             if (!$getStuff) {
                 return ResponseFormatter::sendResponse(404, false, 'Data Stuff Not Found', $getStuff);
             } else {
-                $deleteStuff = $getStuff->delete();
+
+
+                
+                if (!$getStuff->inboundStuffs || !$getStuff->stuffStock || !$getStuff->lendings) {
+                    return ResponseFormatter::sendResponse(400, "bad request", "Tidak dapat menghapus data stuff, sudah terdapat data inbound!");
+                } else {
+                    $deleteStuff = $getStuff->delete();
+                }
 
                 if ($deleteStuff) {
                     return ResponseFormatter::sendResponse(200, true, 'Successfully Delete A Stuff Data');
@@ -199,7 +206,7 @@ class StuffController extends Controller
         }
     }
 
-    public function forceDestroy($id)
+    public function forceDestroy($id)//delete permanent
     {
         try {
 

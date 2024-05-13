@@ -11,8 +11,12 @@ class Stuff extends Model
 
     // protected $primaryKey = 'no';
     // Set kolom primary key jika kolom primary key bukan lah kolom id, karena default primary key pada suatu tabel di laravel terdapat di kolom id
-    
-    protected $fillable = [ 
+
+    // protected $timestamps = false;
+    // digunakan ketika ingin menonaktifkan kolom timestamps (created_at dan updated_at)
+
+
+    protected $fillable = [
         'name',
         'category',
     ];
@@ -29,6 +33,8 @@ class Stuff extends Model
 
     public function lendings()
     {
-        return $this->hasMany(Lending::class);
+        return $this->hasMany(lending::class, 'PK_column', 'FK_column');
     }
+
+   
 }

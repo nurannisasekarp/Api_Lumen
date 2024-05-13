@@ -22,18 +22,33 @@ class Lending extends Model
         'total_stuff',
     ];
 
+
+    // hasOne/hasMany => primary key
+    // belongsTo => foreign key
+
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // kolom pk = id
+    // kolom fk = stuffs_id
     public function stuff()
     {
         return $this->belongsTo(Stuff::class); // Kolom FK berada di model Lending/tabel lendings dan kolom PK berada di model Stuff/table stuffs
     }
 
+    // return $this->belongsTo(Model::class, 'kolom_fk', 'kolom_pk')
+    // return $this->hasMany(Model::class, 'kolom_fk', 'kolom_pk')
+
     public function restoration()
     {
         return $this->hasOne(Restoration::class); // Kolom PK berada di model Lending/tabel lendings dan kolom FK berada di model Restoration/table restorations
+    }
+
+    public function stuffstock()
+    {
+        return $this->hasOne(Restoration::class); 
     }
 }

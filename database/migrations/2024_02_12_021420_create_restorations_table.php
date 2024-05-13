@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('user_id');
             $table->bigInteger('lending_id');
             $table->datetime('date_time');
-            $table->integer('total_goof_stuff');
+            $table->integer('total_good_stuff');
             $table->integer('total_defac_stuff');
             $table->timestamps();
             $table->softDeletes();

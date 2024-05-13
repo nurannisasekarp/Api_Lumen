@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
+     *2
      * @return \Illuminate\Http\Response
      */
     public function index()
@@ -120,12 +120,20 @@ class UserController extends Controller
                     'role' => 'required'
                 ]);
 
+                if ($request->password) {
                 $updateUser = $getUser->update([
                     'username' => $request->username,
                     'email' => $request->email,
                     'password' => app('hash')->make($request->password),
                     'role' => $request->role,
                 ]);
+            } else {
+                $updateUser = $getUser->update([
+                    'username' => $request->username,
+                    'email' => $request->email,
+                    'role' => $request->role,
+                ]);
+            }
 
                 if ($updateUser) {
                     return ResponseFormatter::sendResponse(200, true, 'Successfully Update A User Data', $getUser);
@@ -186,8 +194,9 @@ class UserController extends Controller
             if (!$getUser) {
                 return ResponseFormatter::sendResponse(404, false, 'Data User Not Found');
             } else {
-                $restoreUser = $getUser->restore();
-
+                $restoreUser = User::onlyTrashed()->where('id', $id)->restore();
+                // where => mencari berdasarkan kolom spesifik yang ingin dicari
+                // find => mencari berdasarkan kolom primary key
                 if ($restoreUser) {
                     $getRestore = User::find($id);
 
@@ -224,7 +233,11 @@ class UserController extends Controller
         try {
             $this->validate($request, [
                 'email' => 'required',
-                'password' => 'required',
+                'password' => 'required|min:8',
+            ], [
+                'email.required' => 'Email harus diisi',
+                'password.required' => 'Password harus diisi',
+                'password.min' => 'Password minimal 8 karakter'
             ]);
 
             $user = User::where('email', $request->email)->first(); // Mencari dan mendapatkan data user berdasarkan email yang digunakan untuk login
@@ -252,6 +265,33 @@ class UserController extends Controller
                     ]);
 
                     return ResponseFormatter::sendResponse(200, true, 'Login Successfully', $user);
+                }
+            }
+        } catch (\Exception $e) {
+            return ResponseFormatter::sendResponse(400, false, $e->getMessage());
+        }
+    }
+
+    public function logout(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'email' => 'required',
+            ]);
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return ResponseFormatter::sendResponse(400, false, 'Login Failed! User Doesnt Exists');
+            } else {
+                if (!$user->token) {
+                    return ResponseFormatter::sendResponse(400, false, 'Logout Failed! User Doesnt Login Scien');
+                } else {
+                    $logout = $user->update(['token' => null]);
+
+                    if ($logout) {
+                        return ResponseFormatter::sendResponse(200, true, 'Logout Successfully');
+                    }
                 }
             }
         } catch (\Exception $e) {

@@ -18,13 +18,15 @@ $router->get('/', function () use ($router) {
 });
 
 // Struktur pembuatan route
-// $route->methodHttp('/path', 'NamaController@method');
+// $router->methodHttp('/path', 'NamaController@method');
+
 
 $router->group(['prefix' => 'api/v1/'], function () use ($router) {
 
     $router->post('/login', 'UserController@login');
+    $router->get('/logout', 'UserController@logout');
 
-    $router->group(['prefix' => 'stuff/', 'middleware' => 'auth'], function () use ($router) {
+    $router->group(['prefix' => 'stuff/'], function () use ($router) {
         $router->get('/', 'StuffController@index');
         $router->post('store', 'StuffController@store');
         $router->get('detail/{id}', 'StuffController@show');
@@ -70,12 +72,12 @@ $router->group(['prefix' => 'api/v1/'], function () use ($router) {
         $router->get('force-delete/{id}', 'InboundStuffController@forceDestroy');
     });
 
-    $router->group(['prefix' => 'lending'], function () use ($router) {
+    $router->group(['prefix' => 'lendings'], function () use ($router) {
         $router->get('/', 'LendingController@index');
         $router->post('store', 'LendingController@store');
         $router->get('detail/{id}', 'LendingController@show');
         $router->patch('update/{id}', 'LendingController@update');
-        $router->delete('delete/{id}', 'LendingController@destroy');
+        $router->delete('delete/{id}', 'LendingController@destroy'); // dari route ini ngarahin ke controller LendingController dengan function bagian destroy
         $router->get('recycle-bin', 'LendingController@recycleBin');
         $router->get('restore/{id}', 'LendingController@restore');
         $router->get('force-delete/{id}', 'LendingController@forceDestroy');

@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     // Method up() berfungsi untuk mendefinisikan perubahan yang akan dilakukan pada skema database (menambah tabel, kolom,  atau index pada tabel)
+    // method up() berjalan ketika menjalankan php artisan migrate
+
     {
         Schema::create('stuffs', function (Blueprint $table) { // syarat penamaan tabel di laravel adalah diakhiri oleh huruf s
             $table->id(); // Default kolom dari suatu migration nantinya nama kolomnya adalah id yang bertipe data bigInteger dengan sequence auto increment dan constraint primary key
@@ -40,6 +42,7 @@ return new class extends Migration
      */
     public function down(): void
     // Method down() berfungsi untuk mendefinisikan pembatalan perubahan yang akan dilakukan pada skema database (mengembalikan status pada posisi sebelum method up dijalankan)
+    // php artisan migrate:rollback
     {
         Schema::dropIfExists('stuffs');
     }
@@ -49,7 +52,7 @@ return new class extends Migration
 // menjalankan semua migration agar terjadi perubahan/penambahan di database seuai dengan isi dari migration (menjalankan method up())
 
 // php artisan migrate:rollback
-// mengembalikan kondisi sebelum migration dijalankan (menjalankan method up)
+// mengembalikan kondisi sebelum migration dijalankan (menjalankan method down)
 
 // php artisan migrate:rollback --step=2
 // mengembalikan kondisi sebelum dijalankan hanya pada migration yang termasuk kedalam batch 2 saja, batch dapat dilihat ditabel migrations

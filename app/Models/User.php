@@ -32,7 +32,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
-
+    // no => users
+    // user_id => lendings
     public function lendings()
     {
         return $this->hasMany(Lending::class);
